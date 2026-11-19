@@ -41,7 +41,7 @@ function ctx(R) {
   const S = new Date(state.start);
   const [h, m] = state.bake.split(':').map(Number);
   const B = new Date(S); B.setDate(B.getDate() + 1); B.setHours(h, m, 0, 0);
-  const racks = Math.min(2, Math.max(1, state.pans));
+  const racks = Math.min(3, Math.max(1, state.pans));
   const rF = Math.ceil(R.foc.n / racks), rP = Math.ceil(R.piz.n / racks);
   const tF = 30, tP = 20;
   const fridgeMs = (+addM(B, -270)) - (+addM(S, 180));
@@ -233,7 +233,7 @@ function pageRicette() {
   <h2 class="sec">Ingredienti</h2>${ingTable(r, flour)}
   <p class="muted small">Idratazione ${k === 'foc' ? '70 % + patata (circa 80 % effettivo)' : '72 %'}. Lievito fresco 2 g per kg: pensato per circa 25 ore totali (frigo più 6–7 ore a temperatura ambiente). Con meno di 20 ore in frigo usa 3 g per kg.</p>
   <h2 class="sec">Condimento per ${c.n} ${c.n === 1 ? 'teglia' : 'teglie'}</h2>
-  <table class="ing"><tbody>${T.map(t => `<tr><td>${t.n}</td><td class="q">${nf.format(Math.ceil(t.per * c.n))} ${t.u}</td></tr>`).join('')}<tr><td>Olio EVO in teglia e sopra</td><td class="q">${Math.ceil(OIL_PER_PAN[k] * c.n)} g</td></tr></tbody></table>
+  <table class="ing"><tbody>${T.map(t => `<tr><td>${t.n}</td><td class="q">${nf.format(Math.ceil(t.per * c.n))} ${c.n > 1 && t.u2 ? t.u2 : t.u}</td></tr>`).join('')}<tr><td>Olio EVO in teglia e sopra</td><td class="q">${Math.ceil(OIL_PER_PAN[k] * c.n)} g</td></tr></tbody></table>
   <div class="foot-actions"><a class="btn" href="#/piano">Vai al procedimento</a><a class="btn ghost" href="#/spesa">Lista della spesa</a></div>
   <h2 class="sec">Fonti e adattamenti</h2>
   <ul class="src">${k === 'foc' ? `
