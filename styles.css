@@ -53,7 +53,7 @@ main{max-width:720px;margin:0 auto;padding:18px 18px 0;outline:0}
 .tile.img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,14,8,.05),rgba(20,14,8,.8))}
 .tile.img>*:not(img){position:relative;z-index:1}.tile.img .no,.tile.img small{color:#F0DFB6}.tile.img .no{position:absolute}
 .tile:nth-child(1){grid-column:span 2;min-height:176px}
-.foot-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}.foot-actionsheader.top{margin-top:4px}
+.foot-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 4px}.foot-actions.first{margin-top:4px}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--ink);color:var(--paper);padding:12px 18px;border-radius:12px;font-weight:600;text-decoration:none;font-size:15px}
 .btn:active{transform:scale(.98)}
