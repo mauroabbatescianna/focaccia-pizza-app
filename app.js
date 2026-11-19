@@ -21,9 +21,10 @@ const dur = ms => { const m = Math.max(0, Math.round(ms / 60000)); const h = Mat
 /* ============ STATO ============ */
 function defaults() {
   const n = new Date(); n.setSeconds(0, 0); n.setMinutes(Math.ceil(n.getMinutes() / 5) * 5);
-  return { focFlour: 1000, pizFlour: 1000, pans: 4, start: +n, bake: '16:30', done: {}, shop: {}, timers: {}, recTab: 'foc' };
+  return { focFlour: 1050, pizFlour: 1000, pans: 4, start: +n, bake: '16:30', done: {}, shop: {}, timers: {}, recTab: 'foc' };
 }
-let state = (() => { try { return Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY)) || {}); } catch (e) { return defaults(); } })();
+let state = (() => {
+  const fix = o => { if (Date.now() - o.start > 36 * 3600e3) { o.start = defaults().start; o.done = {}; o.timers = {}; } return o; }; try { return fix(Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY)) || {})); } catch (e) { return defaults(); } })();
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { } };
 
 /* ============ CALCOLI ============ */
@@ -65,7 +66,7 @@ function shopItems() {
   add('sem', 'Farine', 'Semola rimacinata di grano duro', fmtG(F.q.sem), 'have');
   add('liev', 'Impasto', 'Lievito di birra fresco', fmtG(F.q.liev + P.q.liev, true) + ' (1 cubetto da 25 g basta)', 'have');
   add('pat', 'Impasto', 'Patate a pasta gialla', Math.max(1, Math.ceil(F.q.pat / 180)) + ' medie (circa ' + fmtG(F.q.pat * 1.15) + ')');
-  add('sale', 'Impasto', 'Sale fino', fmtG(F.q.sale + P.q.sale + 10));
+  add('sale', 'Impasto', 'Sale fino', fmtG(F.q.sale + P.q.sale + F.n * 5 + 10));
   add('miele', 'Impasto', 'Miele (al posto del malto)', fmtG(F.q.miele + P.q.miele));
   const oilG = F.q.olio + P.q.olio + F.n * OIL_PER_PAN.foc + P.n * OIL_PER_PAN.piz;
   add('olio', 'Impasto', 'Olio extravergine di oliva', '≈ ' + Math.ceil(oilG / 0.91 / 50) * 50 + ' ml');
@@ -162,7 +163,7 @@ function pageHome() {
   const tiles = [
     ['piano', '01', 'Piano e procedimento', doneN + ' di ' + STEPS.length + ' passi · orari e timer', 'img/impasto.jpg'],
     ['ricette', '02', 'Ricette e dosi', R.foc.n + ' focacce · ' + R.piz.n + ' pizze in teglia', 'img/focaccia.jpg'],
-    ['autolisi', '03', 'Autolisi e pieghe', '40 minuti · pieghe a tre', null],
+    ['autolisi', '03', 'Autolisi e pieghe', '40 minuti · stretch & fold', null],
     ['spesa', '04', 'Lista della spesa', toBuy ? toBuy + ' da prendere' : 'Tutto preso', null],
     ['materiali', '05', 'Farine e contenitori', 'Cosa usare e perché', null],
     ['forno', '06', 'Forno Samsung Dual Cook', '250 °C · 2 fasi per teglia', 'img/pizza.jpg'],
@@ -197,7 +198,7 @@ function pagePiano() {
     <label>Prima infornata (domani)<input type="time" id="in-bake" data-in="bake" value="${state.bake}"></label>
   </div>
   <div class="strip ${ok ? '' : 'bad'}"><div><b>${C.fridgeH}</b><small>in frigo</small></div><div><b>${C.rF + C.rP}</b><small>giri di forno</small></div><div><b>${hm(addM(C.end, 15))}</b><small>pronto${C.ok ? '' : ' (tardi)'}</small></div></div>
-  ${ok ? '' : '<p class="alert">La maturazione in frigo dovrebbe stare tra 14 e 40 ore. Cambia gli orari.</p>'}
+  ${C.fh >= 14 && C.fh < 20 ? '<p class="alert">Frigo sotto le 20 ore: usa 3 g di lievito per kg.</p>' : ''}${ok ? '' : '<p class="alert">La maturazione in frigo dovrebbe stare tra 14 e 40 ore. Cambia gli orari.</p>'}
   <h2 class="sec">Oggi</h2><div class="steps">${sec(0)}</div>
   <h2 class="sec">Domani</h2><div class="steps">${sec(1)}</div>`;
 }
@@ -230,7 +231,7 @@ function pageRicette() {
     <p class="muted small">Oppure scegli le teglie:</p>
     <div class="chips">${presets.map(n => `<button data-act="preset" data-n="${n}" class="${c.n === n ? 'on' : ''}">${n} teglie</button>`).join('')}</div></div>
   <h2 class="sec">Ingredienti</h2>${ingTable(r, flour)}
-  <p class="muted small">Idratazione ${k === 'foc' ? '70 % + patata (circa 80 % effettivo)' : '72 %'}. Lievito fresco 2 g per kg di farina: per 24–30 ore di maturazione in frigo.</p>
+  <p class="muted small">Idratazione ${k === 'foc' ? '70 % + patata (circa 80 % effettivo)' : '72 %'}. Lievito fresco 2 g per kg: pensato per circa 25 ore totali (frigo più 6–7 ore a temperatura ambiente). Con meno di 20 ore in frigo usa 3 g per kg.</p>
   <h2 class="sec">Condimento per ${c.n} ${c.n === 1 ? 'teglia' : 'teglie'}</h2>
   <table class="ing"><tbody>${T.map(t => `<tr><td>${t.n}</td><td class="q">${nf.format(Math.ceil(t.per * c.n))} ${t.u}</td></tr>`).join('')}<tr><td>Olio EVO in teglia e sopra</td><td class="q">${Math.ceil(OIL_PER_PAN[k] * c.n)} g</td></tr></tbody></table>
   <div class="foot-actions"><a class="btn" href="#/piano">Vai al procedimento</a><a class="btn ghost" href="#/spesa">Lista della spesa</a></div>
@@ -256,7 +257,7 @@ function pageAutolisi() {
   <h2 class="sec">Come farla</h2>
   ${ol(['Farine + <b>circa 90 %</b> dell’acqua totale (tieni da parte l’8 % della farina in acqua, 80 g per kg).', 'Mescola solo fino a non vedere farina asciutta.', 'Copri e riposa <b>40 minuti</b> a 20–22 °C. Con la semola puoi arrivare a 60 minuti.', 'Aggiungi poi lievito (in soluzione), miele, patata e sale, e “pinza” 10–12 minuti.'])}
   <div class="row">${tmr('auto', 'Autolisi', 40)}</div>
-  <h2 class="sec">Pieghe a tre</h2>
+  <h2 class="sec">Stretch &amp; fold</h2>
   ${ol(['Mani bagnate. Afferra un lembo, tiralo verso l’alto senza strapparlo e ripiegalo al centro.', 'Ruota il contenitore di un quarto e ripeti: 4 lembi = un giro. Due giri a ogni piega.', 'Riposo di 30 minuti tra una piega e l’altra. Due pieghe in tutto.', 'Pieghe a portafoglio per la seconda: più delicate, per non sgonfiare le bolle.'])}
   <div class="row">${tmr('fold1', 'Riposo dopo piega 1', 30)}${tmr('fold2', 'Riposo dopo piega 2', 30)}</div>
   <h2 class="sec">Come capire se funziona</h2>
@@ -287,7 +288,7 @@ function pageForno() {
   <div class="oven"><div class="ov"><b>Preriscalda</b><span>Convenzionale 250 °C, circa 20–25 min</span>${tmr('pre', 'Preriscaldamento forno', 25)}</div>
   <div class="ov"><b>Fase 1 · 15 min</b><span>Sotto + Ventilato 220 °C · ripiano basso</span>${tmr('bf1', 'Focaccia, fase 1', 15)}</div>
   <div class="ov"><b>Fase 2 · 8–10 min</b><span>Convenzionale 220 °C · ripiano centrale</span>${tmr('bf2', 'Focaccia, fase 2', 10)}</div></div>
-  <p class="muted small">Totale circa 25 minuti. Non aprire il forno nei primi 15 minuti.</p>
+  <p class="muted small">Totale circa 25 minuti. Apri il forno solo al minuto 15, per cambiare modalità.</p>
   <h2 class="sec">Pizza in teglia</h2>
   <div class="oven"><div class="ov"><b>Fase 1 · 7 min</b><span>Convenzionale 250 °C · ripiano basso · solo pomodoro</span>${tmr('bp1', 'Pizza, fase 1', 7)}</div>
   <div class="ov"><b>Fase 2 · 6–8 min</b><span>Aggiungi la mozzarella, stessa temperatura</span>${tmr('bp2', 'Pizza, fase 2', 7)}</div>

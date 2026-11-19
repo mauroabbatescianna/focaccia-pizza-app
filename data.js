@@ -36,19 +36,19 @@ const RESERVE = 80;
 /* Condimenti per teglia (g/ml per teglia) */
 const TOPS = {
   foc: [
-    { id: 'pom', n: 'Pomodorini ciliegino', per: 300, u: 'g' },
+    { id: 'pom', n: 'Pomodorini ciliegino', per: 220, u: 'g' },
     { id: 'oli', n: 'Olive baresane / Bella di Cerignola denocciolate', per: 100, u: 'g' },
     { id: 'orig', n: 'Origano secco', per: 2, u: 'g' },
     { id: 'sg', n: 'Sale grosso', per: 4, u: 'g' }
   ],
   piz: [
     { id: 'pel', n: 'Pelati / passata di pomodoro', per: 160, u: 'g' },
-    { id: 'moz', n: 'Mozzarella fior di latte (da scolare)', per: 250, u: 'g' },
+    { id: 'moz', n: 'Mozzarella fior di latte (da scolare)', per: 180, u: 'g' },
     { id: 'bas', n: 'Basilico fresco', per: 1, u: 'mazzetto' },
     { id: 'orig2', n: 'Origano secco', per: 1, u: 'g' }
   ]
 };
-const OIL_PER_PAN = { foc: 60, piz: 25 }; /* olio EVO per teglia + condimento */
+const OIL_PER_PAN = { foc: 80, piz: 30 }; /* olio EVO per teglia + condimento */
 
 /* Video — ID presi dai risultati di ricerca; thumbnail da YouTube */
 const VIDEOS = [
@@ -58,8 +58,8 @@ const VIDEOS = [
   { g: 'Focaccia barese', id: '7kSJF-YAT4E', t: 'Focaccia pugliese soffice con la patata', why: 'Come si presenta l’impasto con la patata.' },
   { g: 'Pizza in teglia e autolisi', id: 'pLg4BL11Dxw', t: 'Pizza in teglia a lunga lievitazione con autolisi: impasto e pieghe', why: 'Autolisi e chiusura delle pieghe su impasto idratato.' },
   { g: 'Pizza in teglia e autolisi', id: 'A-P5eWUyG-8', t: 'Pizza in teglia ad alta idratazione con autolisi', why: 'Gestione di un impasto molto idratato.' },
-  { g: 'Pizza in teglia e autolisi', id: 'r4wf6Ysarxw', t: 'Pizza in teglia con autolisi — 24 ore di maturazione', why: 'Esattamente la tempistica che stai seguendo.' },
-  { g: 'Forno Samsung Dual Cook', id: '3dyM-nQ4r6M', t: 'Come usare le funzioni principali di un forno Samsung (statico, Dual Cook, vapore)', why: 'Impostare modalità, temperatura e Dual Cook.' },
+  { g: 'Pizza in teglia e autolisi', id: 'r4wf6Ysarxw', t: 'Pizza in teglia con autolisi — 24 ore di maturazione', why: 'Autolisi e 24 ore di maturazione (lì con lievito madre, qui lievito di birra).' },
+  { g: 'Forno Samsung Dual Cook', id: '3dyM-nQ4r6M', t: 'Come usare le funzioni principali di un forno Samsung Serie 5', why: 'Impostare modalità, temperatura e Dual Cook.' },
   { g: 'Forno Samsung Dual Cook', id: '91sUtOTEknI', t: 'Samsung Dual Cook Flex Oven — guida completa', why: 'Separatore, zone di cottura e modalità.' },
   { g: 'Forno Samsung Dual Cook', id: 'pzdWvrUIknI', t: 'Samsung Forno Dual Cook Flex (presentazione)', why: 'Come funzionano zona alta e zona bassa.' }
 ];
@@ -84,7 +84,7 @@ function buildSteps(R) {
       timers: [{ id: 'pat', label: 'Patate in bollitura', min: 35 }],
       body: () => li([
         '<b>Pesa tutto</b> in ciotole separate: una per la focaccia, una per la pizza (quantità nella sezione Ricette).',
-        '<b>Patate</b> (' + fl(F, 'pat') + '): lavale, mettile <b>con la buccia</b> in acqua fredda salata e cuocile 30–35 minuti da bollore, finché la forchetta entra senza resistenza. Poi sbuccia, schiaccia e lascia raffreddare: devono essere <b>fredde o tiepide</b> quando le aggiungi.',
+        '<b>Patate</b> (' + fl(F, 'pat') + '): lavale, mettile <b>con la buccia</b> in acqua fredda salata e cuocile 30–35 minuti da bollore, finché la forchetta entra senza resistenza. Poi sbuccia, schiaccia e stendi il purè su un piatto (anche 10 minuti in freezer): devono essere <b>fredde o tiepide (sotto i 30 °C)</b> quando le aggiungi, altrimenti scaldano l’impasto.',
         '<b>Acqua</b> a 18–20 °C (non ghiacciata): serve per arrivare a un impasto finito a 23–24 °C.',
         'Prepara <b>contenitori</b> (vedi Materiali) e olio EVO. Ungi leggermente i contenitori, non infarinarli.'
       ]) },
@@ -103,7 +103,7 @@ function buildSteps(R) {
         '<b>Soluzione di lievito</b>: sciogli 5 g di lievito fresco in 95 g di acqua. Usane <b>20 g ogni grammo di lievito richiesto</b>: focaccia ' + fmtG(F.q.liev, true) + ' = ' + fmtG(F.q.liev * 20) + ' di soluzione, pizza ' + fmtG(P.q.liev, true) + ' = ' + fmtG(P.q.liev * 20) + '. Se la tua bilancia arriva al decimo di grammo, pesa il lievito direttamente.',
         'Aggiungi alla ciotola la soluzione di lievito e il <b>miele</b> (' + fmtG(F.q.miele) + ' focaccia, ' + fmtG(P.q.miele) + ' pizza). Solo focaccia: aggiungi anche la <b>patata schiacciata</b> (' + fmtG(F.q.pat) + ').',
         '<b>Pinza e piega</b> (metodo Rubaud): infila il pollice e l’indice, strizza l’impasto e ripiegalo su sé stesso, ruotando la ciotola. 3–4 minuti, finché lievito e patata sono distribuiti.',
-        'Aggiungi il <b>sale</b> sciolto nei restanti ' + fmtG(F.q.res) + ' (focaccia) e ' + fmtG(P.q.res) + ' (pizza) di acqua, in due volte, e continua a pinzare. L’impasto si scioglierà e poi si ricompatterà: è normale.',
+        'Aggiungi il <b>sale</b> sciolto nei restanti ' + fmtG(F.q.res) + ' (focaccia) e ' + fmtG(P.q.res) + ' (pizza) di acqua, in due volte (se non si scioglie del tutto, aggiungila direttamente), e continua a pinzare. L’impasto si scioglierà e poi si ricompatterà: è normale.',
         '<b>Olio</b> (' + fmtG(F.q.olio) + ' focaccia, ' + fmtG(P.q.olio) + ' pizza) a filo, in 2–3 volte, sempre pinzando.',
         'Fine: impasto liscio, appiccicoso ma coeso, che si stacca dalle pareti. Totale 10–12 minuti. Con planetaria: gancio, velocità bassa, 8–10 minuti, fermandoti prima che si scaldi.'
       ]) },
@@ -138,13 +138,13 @@ function buildSteps(R) {
       ]) },
     { id: 'fridge', day: 0, t: c => addM(c.S, 180), title: 'In frigo: maturazione lenta', short: 'Ripiano centrale, 3–4 °C, coperchio chiuso.',
       body: c => li([
-        'Sposta i contenitori <b>chiusi</b> sul ripiano centrale del frigorifero (non nel cassetto, non contro la parete posteriore).',
+        'Sposta i contenitori con coperchio chiuso ma non ermetico sul ripiano centrale del frigorifero (non nel cassetto, non contro la parete posteriore).',
         'Maturazione prevista: <b>' + c.fridgeH + '</b> fino a domani.',
         'Dopo 3–4 ore l’impasto sarà già cresciuto un po’. È normale e voluto: non aprire il frigo per controllare spesso.'
       ]) },
     { id: 'out', day: 1, t: c => addM(c.B, -270), title: 'Tira fuori i panetti dal frigo', short: 'Contenitori chiusi, 2 ore a temperatura ambiente.', timers: [{ id: 'out', label: 'Panetti fuori dal frigo', at: true }, { id: 'out2', label: 'Acclimatamento (2 h)', min: 120 }],
       body: () => li([
-        'Lascia i contenitori <b>chiusi</b> sul piano (20–22 °C) per circa 2 ore, così l’impasto si ammorbidisce e il freddo esce dal cuore del panetto.',
+        'Lascia i contenitori col coperchio appoggiato sul piano (20–22 °C) per circa 2 ore, così l’impasto si ammorbidisce e il freddo esce dal cuore del panetto.',
         'Intanto prepara: scola e taglia la mozzarella (mettila in colino in frigo), taglia i pomodorini a metà, denocciola le olive, prepara la <b>salamoia</b> (per teglia di focaccia: 50 g acqua + 30 g olio EVO + 5 g sale, emulsionati).',
         'Ungi le teglie e prepara i canovacci.'
       ]) },
@@ -155,18 +155,18 @@ function buildSteps(R) {
         'Rovescia il panetto con un raschietto unto, senza sgonfiarlo.',
         'Con le dita unte allarga l’impasto <b>solo fino a circa 70 % della teglia</b>. Se si ritrae, non forzare: aspetta.',
         'Copri e <b>riposa 20 minuti</b>, poi allarga fino ai bordi.',
-        'Se hai meno teglie del necessario: i panetti destinati al secondo giro restano nei contenitori e vanno in teglia dopo la prima infornata.'
+        'Se hai meno teglie del necessario: i panetti del secondo giro restano nel contenitore e li metti in teglia, condisci e fai lievitare 60–90 minuti mentre il primo giro cuoce. Non condire prima del momento di infornare.'
       ]) },
-    { id: 'proof', day: 1, t: c => addM(c.B, -130), title: 'Appretto in teglia (circa 90 minuti)', short: 'Ultima lievitazione fino a quasi raddoppio.',
+    { id: 'proof', day: 1, t: c => addM(c.B, -130), title: 'Appretto in teglia (90–110 minuti)', short: 'Ultima lievitazione fino a quasi raddoppio.',
       timers: [{ id: 'proof', label: 'Appretto in teglia', min: 90 }],
       body: () => li([
-        'Copri con canovaccio o pellicola unta, in un posto a 24–26 °C (forno spento con la luce accesa va bene).',
+        'Copri con canovaccio o pellicola unta, in un posto a 24–26 °C lontano da correnti (non nel forno: lo accendi tra poco; va bene sopra il piano cottura spento).',
         'Pronta quando è <b>soffice, ricca di bolle e quasi raddoppiata</b>: premendo con un dito la fossetta torna su lentamente.',
         'Se è già pronta prima, infornala prima; se è in ritardo, aspetta fino a 30 minuti.'
       ]) },
     { id: 'pre', day: 1, t: c => addM(c.B, -40), title: 'Accendi il forno', short: 'Convenzionale 250 °C, circa 20–25 minuti per arrivare in temperatura.', ref: '/forno',
       timers: [{ id: 'pre', label: 'Preriscaldamento forno', min: 25 }],
-      body: () => li(['Rimuovi il separatore Dual Cook se presente e posiziona i ripiani (vedi sezione Forno).', 'Imposta Convenzionale 250 °C: aspetta il segnale acustico (circa 20 minuti).']) },
+      body: () => li(['Rimuovi il separatore Dual Cook se presente e posiziona i ripiani (vedi sezione Forno).', 'Imposta Convenzionale 250 °C e aspetta il segnale acustico (20–25 minuti). Quando inforni la focaccia abbassa a 220 °C e cambia modalità come indicato.']) },
     { id: 'top', day: 1, t: c => addM(c.B, -15), title: 'Fossette e condimento', short: 'Focaccia: salamoia, pomodorini, olive. Pizza: solo pomodoro.',
       body: () => ol([
         '<b>Focaccia</b>: versa la salamoia sulla superficie. Con i polpastrelli oleati <b>premi fino a toccare il fondo</b>, facendo fossette ovunque. Distribuisci i pomodorini <b>tagliati a metà e premuti con il lato tagliato verso l’alto</b>, le olive, l’origano e il sale grosso.',
@@ -174,7 +174,7 @@ function buildSteps(R) {
       ]) },
     { id: 'bakeF', day: 1, t: c => c.B, title: 'Cuoci le focacce', short: 'Due fasi: fondo e bordo, poi doratura.', ref: '/forno',
       timers: [{ id: 'bf1', label: 'Focaccia, fase 1', min: 15 }, { id: 'bf2', label: 'Focaccia, fase 2', min: 10 }],
-      body: () => li(['Fase 1 (15 min): modalità Sotto + Ventilato 220 °C, ripiano basso.', 'Fase 2 (8–10 min): Convenzionale 220 °C, ripiano centrale, finché è dorata.', 'Dettaglio e alternative nella sezione Forno.']) },
+      body: () => li(['Una teglia: fase 1 (15 min) Sotto + Ventilato 220 °C, ripiano basso. Due teglie insieme: ripiani 1 e 3, Ventilato 210 °C, scambiale dopo 12 minuti e cuoci ancora 12–15 minuti.', 'Fase 2 (8–10 min): Convenzionale 220 °C, ripiano centrale, finché è dorata.', 'Dettaglio e alternative nella sezione Forno.']) },
     { id: 'bakeP', day: 1, t: c => addM(c.B, c.rF * c.tF), title: 'Cuoci le pizze', short: 'Pomodoro, poi mozzarella.', ref: '/forno',
       timers: [{ id: 'bp1', label: 'Pizza, fase 1 (solo pomodoro)', min: 7 }, { id: 'bp2', label: 'Pizza, fase 2 (con mozzarella)', min: 7 }],
       body: () => li(['Fase 1 (7 min): Convenzionale 250 °C, ripiano basso.', 'Aggiungi la mozzarella ben scolata, torna in forno 6–8 minuti.', 'Dettaglio nella sezione Forno.']) },
@@ -191,20 +191,20 @@ function buildSteps(R) {
 /* ========== FORNO ========== */
 const OVEN_MODES = [
   { n: 'Convenzionale (sopra + sotto)', d: 'Resistenze alta e bassa, senza ventola. Calore più regolare.', use: 'Preriscaldamento, doratura focaccia, pizza a 250 °C.' },
-  { n: 'Sotto + Ventilato', en: 'Bottom Heat + Convection', d: 'Solo resistenza bassa con ventola. Samsung la indica per pizza, pane e dolci.', use: 'Prima fase focaccia: fondo ben cotto e bordo croccante.' },
-  { n: 'Ventilato', d: 'Calore dall’alto e dal basso con ventola, utile su più ripiani.', use: 'Cuocere due teglie su due ripiani, scambiandole a metà cottura.' },
+  { n: 'Sotto + Ventilato', en: 'Bottom Heat + Convection', d: 'Solo resistenza bassa con ventola. Samsung la indica per pizza, pane e dolci, se presente sul tuo modello; altrimenti Convenzionale 230 °C, ripiano basso.', use: 'Prima fase focaccia: fondo ben cotto e bordo croccante.' },
+  { n: 'Ventilato', d: 'Resistenza posteriore con ventola: calore uniforme su più ripiani.', use: 'Cuocere due teglie su due ripiani, scambiandole a metà cottura.' },
   { n: 'Dual Cook', d: 'Con il separatore inserito: due camere a temperature e modalità diverse.', use: 'Solo se le teglie e la focaccia lievitata stanno nella camera alta. Altrimenti togli il separatore.' }
 ];
 
 /* ========== FARINE / CONTENITORI / FAQ ========== */
 const FLOURS = [
-  { n: 'Farina forte W330', role: 'Scheletro dell’impasto', why: 'Con 24–30 ore di maturazione e idratazione al 70–80 % serve una rete di glutine che regga. La W330 assorbe molta acqua e non collassa nella lunga lievitazione.', use: '50 % in entrambi gli impasti.' },
+  { n: 'Farina forte W330', role: 'Scheletro dell’impasto', why: 'Con circa 25 ore di maturazione totale e idratazione al 70–80 % serve una rete di glutine che regga. La W330 assorbe molta acqua e non collassa nella lunga lievitazione.', use: '50 % in entrambi gli impasti.' },
   { n: 'Manitoba W250–290', role: 'Alveolatura e sofficità', why: 'Aggiunge elasticità. Lasciata al 100 % darebbe un impasto troppo tenace che si ritrae in teglia; mescolata alla W330 resta estensibile.', use: '50 % nella pizza.' },
   { n: 'Semola rimacinata di grano duro', role: 'Sapore, colore, croccantezza', why: 'È il tratto distintivo della focaccia barese: sapore di grano, colore giallo, crosta croccante. Ha un glutine poco elastico: serve la W330 vicino, e l’autolisi la idrata bene.', use: '50 % nella focaccia. Non nella pizza.' },
   { n: 'Miele (al posto del malto)', role: 'Doratura e nutrimento per il lievito', why: 'Il malto fornisce zuccheri e aiuta la colorazione. Il miele fa lo stesso: 1 % sulla farina. Scegli acacia o millefiori, dal gusto neutro.', use: '10 g per kg di farina, sostituzione 1:1 del malto.' }
 ];
 const FLOUR_TIPS = [
-  'Cerca la forza W e la proteina sull’etichetta: per questo uso W300+ e proteine 13–14 %.',
+  'Per queste ricette cerca W300+ e proteine 13–14 %.',
   'Marche note per semola rimacinata e farine forti: Caputo, Molino Grassi, Molino Quaglia, Agugiaro & Figna. Sono esempi, non una raccomandazione sponsorizzata.',
   'Conserva le farine chiuse, al fresco. La semola irrancidisce prima.'
 ];
