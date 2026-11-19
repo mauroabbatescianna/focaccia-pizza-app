@@ -21,7 +21,7 @@ const dur = ms => { const m = Math.max(0, Math.round(ms / 60000)); const h = Mat
 /* ============ STATO ============ */
 function defaults() {
   const n = new Date(); n.setSeconds(0, 0); n.setMinutes(Math.ceil(n.getMinutes() / 5) * 5);
-  return { focFlour: 1050, pizFlour: 1000, pans: 4, start: +n, bake: '16:30', done: {}, shop: {}, timers: {}, recTab: 'foc' };
+  return { focFlour: 1000, pizFlour: 1000, pans: 4, start: +n, bake: '16:30', done: {}, shop: {}, timers: {}, recTab: 'foc' };
 }
 let state = (() => {
   const fix = o => { if (Date.now() - o.start > 36 * 3600e3) { o.start = defaults().start; o.done = {}; o.timers = {}; } return o; }; try { return fix(Object.assign(defaults(), JSON.parse(localStorage.getItem(KEY)) || {})); } catch (e) { return defaults(); } })();
@@ -48,7 +48,7 @@ function ctx(R) {
   const fh = fridgeMs / 3600000;
   const c = { S, B, rF, rP, tF, tP, racks, fridgeMs, fh };
   c.end = addM(B, rF * tF + rP * tP);
-  c.fridgeH = 'circa ' + Math.round(fh) + ' ore';
+  c.fridgeH = '~' + Math.round(fh) + ' ore';
   const dl = new Date(B); dl.setHours(DEADLINE_H, 0, 0, 0);
   c.deadline = dl; c.ok = +addM(c.end, 15) <= +dl;
   return c;
@@ -70,8 +70,9 @@ function shopItems() {
   add('miele', 'Impasto', 'Miele (al posto del malto)', fmtG(F.q.miele + P.q.miele));
   const oilG = F.q.olio + P.q.olio + F.n * OIL_PER_PAN.foc + P.n * OIL_PER_PAN.piz;
   add('olio', 'Impasto', 'Olio extravergine di oliva', '≈ ' + Math.ceil(oilG / 0.91 / 50) * 50 + ' ml');
-  TOPS.foc.forEach(t => add('f-' + t.id, 'Condimento focaccia', t.n, nf.format(Math.ceil(t.per * F.n)) + ' ' + t.u, 'have'));
-  TOPS.piz.forEach(t => add('p-' + t.id, 'Condimento pizza', t.n, nf.format(Math.ceil(t.per * P.n)) + ' ' + t.u, 'have'));
+  const tu = (t, n) => nf.format(Math.ceil(t.per * n)) + ' ' + (n > 1 && t.u2 ? t.u2 : t.u);
+  TOPS.foc.forEach(t => add('f-' + t.id, 'Condimento focaccia', t.n, tu(t, F.n), 'have'));
+  TOPS.piz.forEach(t => add('p-' + t.id, 'Condimento pizza', t.n, tu(t, P.n), 'have'));
   add('car', 'Varie', 'Carta forno e teglie unte', '1 rotolo');
   return items;
 }
@@ -181,9 +182,8 @@ function pageHome() {
       <div class="row"><a class="btn" href="#/piano" data-anchor="step-${ns.id}">Apri il passo</a>${(ns.timers || []).filter(t => !t.at).slice(0, 1).map(t => tmr(t.id, t.label, t.min)).join('')}</div>` :
       '<h2>Hai finito. Buon appetito.</h2><p>Per una nuova impastata usa Reset.</p>'}
   </section>
-  <button class="spot" data-act="open-search"><span>Cerca ricette, passi, ingredienti…</span><kbd>⌘K</kbd></button>
-  <h2 class="sec">Bacheca</h2>
-  <div class="tiles">${tiles.map(t => `<a class="tile ${t[4] ? 'img' : ''}" href="#/${t[0]}" id="tile-${t[0]}">${t[4] ? `<img src="${t[4]}" alt="" loading="lazy">` : ''}<span class="no">${t[1]}</span><b>${t[2]}</b><small>${t[3]}</small></a>`).join('')}</div>
+  
+  <div class="tiles">${tiles.map(t => `<a class="tile ${t[4] ? 'img' : ''}" href="#/${t[0]}" id="tile-${t[0]}">${t[4] ? `<img src="${t[4]}" alt="" loading="lazy">` : ''}<b>${t[2]}</b><small>${t[3]}</small></a>`).join('')}</div>
   <div class="foot-actions"><button class="btn ghost" data-act="ics">Aggiungi gli orari al calendario</button><button class="btn ghost warn" data-act="reset-ask" id="reset-open">Reset: nuova impastata</button></div>
   <p class="fine">Nota: nell’impasto non esiste l’“elettrolisi”: la tecnica è l’<b>autolisi</b>. L’app la usa in tutte le ricette.</p>`;
 }
@@ -209,7 +209,7 @@ function stepHtml(s) {
     <summary><label class="chk" data-stop><input type="checkbox" data-act="done" data-id="${s.id}" ${done ? 'checked' : ''} aria-label="Fatto"><i></i></label>
       <span class="when"><b>${hm(t)}</b><small>${dayOf(t)}</small></span><span class="what"><b>${s.title}</b><small>${s.short}</small></span></summary>
     <div class="detail">${s.body(C)}${timers ? '<div class="timers">' + timers + '</div>' : ''}
-      ${(s.vid || s.ref) ? '<div class="links">' + (s.vid ? '<a href="' + ytUrl(s.vid) + '" target="_blank" rel="noopener">▶ Guarda il video</a>' : '') + (s.ref ? '<a href="#' + s.ref + '">Approfondisci</a>' : '') + '</div>' : ''}</div></details>`;
+      ${(s.vid || s.ref) ? '<div class="links">' + (s.vid ? '<a href="' + ytUrl(s.vid) + '" target="_blank" rel="noopener">▶ Guarda il video</a>' : '') + (s.ref ? '<a href="#' + s.ref + '">Approfondisci</a>' : '') + '</div>' : ''}<div class="step-act"><button class="btn ${done ? 'ghost' : ''}" data-act="toggle-done" data-id="${s.id}">${done ? 'Segna da fare' : 'Segna come fatto'}</button></div></div></details>`;
 }
 
 function ingTable(r, flour) {
@@ -301,7 +301,7 @@ function pageForno() {
   <h2 class="sec">Video</h2><div class="vids">${VIDEOS.filter(v => v.g.startsWith('Forno')).slice(0, 2).map(vidCard).join('')}</div>`;
 }
 
-function vidCard(v) { return `<a class="vid" href="${ytUrl(v.id)}" target="_blank" rel="noopener"><span class="th"><img src="${ytThumb(v.id)}" alt="" loading="lazy"><i>▶</i></span><span class="vt"><b>${v.t}</b><small>${v.why}</small></span></a>`; }
+function vidCard(v) { return `<a class="vid" href="${ytUrl(v.id)}" target="_blank" rel="noopener"><span class="th"><img src="${ytThumb(v.id)}" alt="" loading="lazy" onerror="this.remove()"><i>▶</i></span><span class="vt"><b>${v.t}</b><small>${v.why}</small></span></a>`; }
 function pageVideo() {
   const groups = [...new Set(VIDEOS.map(v => v.g))];
   return `${back()}<h1>Video tutorial</h1><p class="lead">Si aprono su YouTube.</p>
@@ -314,7 +314,7 @@ function pageSpesa() {
   const toBuy = items.filter(i => !shopState(i)).length;
   return `${back()}<h1>Lista della spesa</h1>
   <p class="lead"><b>${toBuy}</b> da prendere su ${items.length}. Per ogni voce: già a casa o nel carrello.</p>
-  <div class="foot-actions top"><button class="btn" data-act="copy" data-m="buy" id="copy-buy">Copia solo da comprare</button><button class="btn ghost" data-act="copy" data-m="all" id="copy-all">Copia lista completa</button>${navigator.share ? '<button class="btn ghost" data-act="share">Condividi…</button>' : ''}</div>
+  <div class="foot-actions first"><button class="btn" data-act="copy" data-m="buy" id="copy-buy">Copia solo da comprare</button><button class="btn ghost" data-act="copy" data-m="all" id="copy-all">Copia lista completa</button>${navigator.share ? '<button class="btn ghost" data-act="share">Condividi…</button>' : ''}</div>
   ${groups.map(g => `<h2 class="sec">${g}</h2><ul class="shop">${items.filter(i => i.grp === g).map(i => { const s = shopState(i); return `<li class="${s}" id="shop-${i.id}"><div class="nm"><b>${i.n}</b><small>${i.qty}</small></div><div class="sw"><button data-act="have" data-id="${i.id}" class="${s === 'have' ? 'on' : ''}" aria-pressed="${s === 'have'}">Ho già</button><button data-act="cart" data-id="${i.id}" class="${s === 'cart' ? 'on' : ''}" aria-pressed="${s === 'cart'}">Carrello</button></div></li>`; }).join('')}</ul>`).join('')}
   <p class="fine">Farine, lievito e condimenti sono già segnati “Ho già”. Le quantità cambiano con le dosi nella sezione Ricette.</p>`;
 }
@@ -378,7 +378,7 @@ function openSearch() {
 function searchRun(v) {
   const toks = norm(v).split(/\s+/).filter(Boolean);
   if (!toks.length) sres = SIDX.filter(i => i.ty === 'Sezione' && i.r !== 'home');
-  else sres = SIDX.map(i => { if (!toks.every(t => i.h.includes(t))) return null; let sc = 0; toks.forEach(t => { if (i.n.includes(t)) sc += 5; if (i.n.startsWith(t)) sc += 3; sc += 1; }); if (i.ty === 'Sezione') sc += 2; return [sc, i]; }).filter(Boolean).sort((a, b) => b[0] - a[0]).slice(0, 14).map(x => x[1]);
+  else sres = SIDX.map(i => { if (!toks.every(t => i.h.includes(t))) return null; let sc = 0; toks.forEach(t => { if (i.n.includes(t)) sc += 5; if (i.n.startsWith(t)) sc += 3; sc += 1; }); if (i.ty === 'Sezione') sc += 6; return [sc, i]; }).filter(Boolean).sort((a, b) => b[0] - a[0]).slice(0, 14).map(x => x[1]);
   ssel = 0;
   $('#res').innerHTML = sres.length ? sres.map((i, k) => '<li><button data-act="go" data-k="' + k + '" class="' + (k === 0 ? 'sel' : '') + '"><span class="ty">' + i.ty + '</span><b>' + esc(i.t) + '</b></button></li>').join('') : '<li class="none">Nessun risultato per “' + esc(v) + '”</li>';
 }
@@ -422,6 +422,7 @@ document.addEventListener('click', async e => {
     case 'ack': Object.values(state.timers).forEach(t => { if (t.end <= Date.now()) t.ack = true; }); save(); ringCheck(); break;
     case 'sheet-timers': openSheet(timersSheet()); tick(); break;
     case 'done': state.done[id] = a.checked; save(); render(true); break;
+    case 'toggle-done': state.done[id] = !state.done[id]; save(); render(true); break;
     case 'have': case 'cart': { const it = shopItems().find(x => x.id === id), cur = shopState(it); state.shop[id] = cur === act ? 'none' : act; save(); render(true); break; }
     case 'copy': toast((await copyText(shopText(a.dataset.m === 'buy'))) ? 'Lista copiata. Incollala su WhatsApp o Telegram.' : 'Copia non riuscita'); break;
     case 'share': try { await navigator.share({ title: 'Lista della spesa', text: shopText(true) }); } catch (er) { } break;

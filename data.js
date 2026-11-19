@@ -44,7 +44,7 @@ const TOPS = {
   piz: [
     { id: 'pel', n: 'Pelati / passata di pomodoro', per: 160, u: 'g' },
     { id: 'moz', n: 'Mozzarella fior di latte (da scolare)', per: 180, u: 'g' },
-    { id: 'bas', n: 'Basilico fresco', per: 1, u: 'mazzetto' },
+    { id: 'bas', n: 'Basilico fresco', per: 1, u: 'mazzetto', u2: 'mazzetti' },
     { id: 'orig2', n: 'Origano secco', per: 1, u: 'g' }
   ]
 };
